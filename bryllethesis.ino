@@ -1,6 +1,5 @@
 #include <Arduino.h>
-#include "AnalogReader.h"
-#include <ESP32Firebase.h>
+#include <WiFi.h>
 #include "PHSensor.h"
 
 // Create an instance of PHSensor with default values
@@ -8,8 +7,8 @@ PHSensor phSensor;
 
 #define _SSID "IVILLIS 2.4G"                                                                    // Your WiFi SSID
 #define _PASSWORD "akogwapo123"                                                                 // Your WiFi Password
-#define REFERENCE_URL "https://hydro-8aaba-default-rtdb.asia-southeast1.firebasedatabase.app/"  // Your Firebase project reference url
-Firebase firebase(REFERENCE_URL);
+// #define REFERENCE_URL "https://hydro-8aaba-default-rtdb.asia-southeast1.firebasedatabase.app/"  // Your Firebase project reference url
+// Firebase firebase(REFERENCE_URL);
 
 /* PINS */
 const int inputPin = 35;        // Input pin for the sensor
@@ -20,10 +19,10 @@ const int lightSensorPin = 34;  // Input for daylight sensor
 const int pwmPin = 16;          // PWM pin connected to the gate of the MOSFET
 
 /* Delays */
-const unsigned long drainTime = 60000;   // Time for draining in milliseconds
-const unsigned long refillTime = 60000;  // Time for refilling in milliseconds
+const unsigned long drainTime = 600000;   // Time for draining in milliseconds
+const unsigned long refillTime = 480000;  // Time for refilling in milliseconds
 const unsigned long readDelay = 7000;    // Delay before reading pH again
-const int drainThresh = 4;               // Threshold for draining
+const int drainThresh = 4.9;               // Threshold for draining
 unsigned long lastLightSensorTime = 0;
 const unsigned long lightSensorDelay = 1000;
 
