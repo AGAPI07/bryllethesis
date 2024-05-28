@@ -5,8 +5,8 @@
 // Create an instance of PHSensor with default values
 PHSensor phSensor;
 
-#define _SSID "IVILLIS 2.4G"                                                                    // Your WiFi SSID
-#define _PASSWORD "akogwapo123"                                                                 // Your WiFi Password
+#define _SSID "IVILLIS 2.4G"     // Your WiFi SSID
+#define _PASSWORD "akogwapo123"  // Your WiFi Password
 // #define REFERENCE_URL "https://hydro-8aaba-default-rtdb.asia-southeast1.firebasedatabase.app/"  // Your Firebase project reference url
 // Firebase firebase(REFERENCE_URL);
 
@@ -58,7 +58,7 @@ const int pwmPin = 16;          // PWM pin connected to the gate of the MOSFET
 const unsigned long drainTime = 300000;   // Time for draining in milliseconds
 const unsigned long refillTime = 180000;  // Time for refilling in milliseconds
 const unsigned long readDelay = 7000;     // Delay before reading pH again
-const int drainThresh = 5;              // Threshold for draining
+const int drainThresh = 5;                // Threshold for draining
 unsigned long lastLightSensorTime = 0;
 const unsigned long lightSensorDelay = 1000;
 
@@ -156,7 +156,7 @@ void SetupWifiDatabase() {
 void asyncCB(AsyncResult &aResult) {
   // WARNING!
   // Do not put your codes inside the callback and printResult.
-
+  taskComplete = false;
   printResult(aResult);
 }
 
@@ -181,6 +181,8 @@ void onPHUpdate(float pHValue) {
   Serial.print("Callback pH Value: ");
   Serial.println(pHValue);
   PHVALUE = pHValue;
+  if (app.ready()) Database.set<int>(aClient, "Example/Light Brightness", Brightness, asyncCB, "setIntTask");
+  if (app.ready()) Database.set<float>(aClient, "Example/pHValue", PHVALUE, asyncCB, "setFloatTask");
   // firebase.setFloat("Example/pHValue", pHValue);
   // firebase.setInt("Example/Light Brightness", Brightness);
   // Perform other actions when pH value is updated
@@ -234,57 +236,6 @@ void firebaseLoop() {
   app.loop();
 
   Database.loop();
-
-  if (app.ready() && !taskComplete) {
-    taskComplete = true;
-
-    Serial.println("Asynchronous Set... ");
-
-    // Set int
-    Database.set<int>(aClient, "Example/Light Brightness", Brightness, asyncCB, "setIntTask");
-
-    // Set bool
-    Database.set<bool>(aClient, "/test/bool", true, asyncCB, "setBoolTask");
-
-    // Set string
-    Database.set<String>(aClient, "/test/string", "hello", asyncCB, "setStringTask");
-
-    // Set json
-    Database.set<object_t>(aClient, "/test/json", object_t("{\"data\":123}"), asyncCB, "setJsonTask");
-
-    // Library does not provide JSON parser library, the following JSON writer class will be used with
-    // object_t for simple demonstration.
-
-    object_t json, obj1, obj2, obj3, obj4;
-    JsonWriter writer;
-
-    writer.create(obj1, "int/value", 9999);
-    writer.create(obj2, "string/value", string_t("hello"));
-    writer.create(obj3, "float/value", number_t(123.456, 2));
-    writer.join(obj4, 3 /* no. of object_t (s) to join */, obj1, obj2, obj3);
-    writer.create(json, "node/list", obj4);
-
-    // To print object_t
-    // Serial.println(json);
-
-    Database.set<object_t>(aClient, "/test/json", json, asyncCB, "setJsonTask");
-
-    object_t arr;
-    arr.initArray();  // initialize to be used as array
-    writer.join(arr, 4 /* no. of object_t (s) to join */, object_t("[12,34]"), object_t("[56,78]"), object_t(string_t("steve")), object_t(888));
-
-    // Note that value that sets to object_t other than JSON ({}) and Array ([]) can be valid only if it
-    // used as array member value as above i.e. object_t(string_t("steve")) and object_t(888).
-
-    // Set array
-    Database.set<object_t>(aClient, "/test/arr", arr, asyncCB, "setArrayTask");
-
-    // Set float
-    Database.set<number_t>(aClient, "Example/pHValue", number_t(PHVALUE, 2), asyncCB, "setFloatTask");
-
-    // Set double
-    Database.set<number_t>(aClient, "/test/double", number_t(1234.56789, 4), asyncCB, "setDoubleTask");
-  }
 }
 void loop() {
   lightSensor();

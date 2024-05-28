@@ -9,10 +9,10 @@ public:
   PHSensor(
     int sensorPin = 35,
     int numSamples = 20,
-    int rawVinegar = 450,
-    int rawWater = 2200,
+    int rawVinegar = 1770,
+    int rawWater = 3125,
     float pHVinegar = 2.5,
-    float pHWater = 6.5,
+    float pHWater = 7.0,
     unsigned long sampleInterval = 30);
 
   void begin();
